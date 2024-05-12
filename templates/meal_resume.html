@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Meal resume{% endblock %}
+{% block body %}
+    <h1>Meal resume</h1>
+    <h2>The grid with details</h2>
+    <button id="ok">Ok</button>
+    {% if haveSession %}
+        <button id="favorite_meal_button">Save in your favorite meal only if have an account</button>
+    {% endif %}
+    <script>
+        document.getElementById("ok").addEventListener("click", function() {
+            window.location.href = "/foodstuffs_selection";
+        });
+        document.getElementById("favorite_meal_button").addEventListener("click", function() {
+            
+        });
+    </script>
+{% endblock %}

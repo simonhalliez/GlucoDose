@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Name of the app{% endblock %}
+{% block body %}
+    <h1>Name of the app</h1>
+    <button id="sign_in" methode >Sign in</button>
+    <button id="account_creation">Create an account</button>
+    <button id="no_account">No account</button>
+    <script>
+        document.getElementById("sign_in").addEventListener("click", function() {
+            window.location.href = "/sign_in";
+        });
+        document.getElementById("account_creation").addEventListener("click", function() {
+            window.location.href = "/account_creation";
+        });
+        document.getElementById("no_account").addEventListener("click", function() {
+            window.location.href = "/foodstuffs_selection";
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Select your foodstuffs{% endblock %}
+{% block body %}
+    <h1>Select your foodstuffs</h1>
+    <button id="computeButton">Compute</button>
+    <script>
+        document.getElementById("computeButton").addEventListener("click", function() {
+            window.location.href = "/meal_resume";
+        });
+    </script>
+{% endblock %}
