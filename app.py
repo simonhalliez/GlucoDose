@@ -39,13 +39,18 @@ def user_page():
 @app.route("/account_creation", methods=["POST", "GET"])
 def account_creation():
     if request.method == "POST":
+        print("Account")
         username = request.form["username"]
         password = request.form["password"]
+        return redirect(url_for("sign_in"))
     return render_template("account_creation.html")
 
 @app.route("/foodstuffs_selection")
 def foodstuffs_selection():
-    return render_template("foodstuffs_selection.html")
+    list_food_stucks = [{'label':"Tomato", 'image_link':"https://img.freepik.com/vecteurs-libre/tomates-fraiches_1053-566.jpg?w=740&t=st=1715677134~exp=1715677734~hmac=8d8bd9c4ab06aad73268c77d7ad362ce392f8fc6df666bb9ddd0a342f7850348"},
+                        {'label':"Potato"},{'label':"Beens"}, {'label':"Banana"},{'label':"Maize"},{'label':"Stawberry"},{'label':"Ketchup"}, {'label':"Salad"},
+                        {'label':"Porc"},{'label':"Veau"},{'label':"Poisson"},{'label':"Chocapic"},{'label':"Durum"},{'label':'Pate'},{'label':"Fromage"},{'label':"Tartine"},{'label':"Brocoli"}]
+    return render_template("foodstuffs_selection.html", list_food_stucks = list_food_stucks)
 
 @app.route("/meal_resume")
 def meal_resume():

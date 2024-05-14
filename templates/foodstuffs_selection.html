@@ -1,11 +1,130 @@
 {% extends "base.html" %}
 {% block title %}Select your foodstuffs{% endblock %}
 {% block body %}
-    <h1>Select your foodstuffs</h1>
-    <button id="computeButton">Compute</button>
-    <script>
+    
+    <div class="container-fluid">
+
+        <h1>Select your foodstuffs</h1>
+        <div class="row">
+            <div class="col-md-3">
+                <h2>Your meal</h2>
+                <p>Contenu de la colonne de gauche.</p>
+                <ul id="productList" class="product-list"></ul>
+                <p id="test"> </p>
+                <button id="computeButton">Compute</button>
+            </div>
+            <div class="col-md-9">
+                <div class="row my-3">
+                    {% for idx_str in ["0","1","2","3","4","5","6","7"] %}
+                    
+                        <div class="col-sm-3 my-3">
+                            <div class="row mb-1">
+                                <div class="col">
+                                    <img src="https://img.freepik.com/vecteurs-libre/tomates-fraiches_1053-566.jpg?w=740&t=st=1715677134~exp=1715677734~hmac=8d8bd9c4ab06aad73268c77d7ad362ce392f8fc6df666bb9ddd0a342f7850348" alt="Image not Found" class="img-thumbnail">
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col">
+                                    <p class="text-center" id={{ "foodstuck_label_"+idx_str }}></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-success align-self-end" id={{ "foodstuck_button_"+idx_str }} >Add</button>
+                                    
+                                </div>
+                            </div>
+                            
+                        </div>
+                    
+                    {% endfor %}
+                    
+
+                </div>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                      <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>
+                      </li>
+                      <li class="page-item"><a class="page-link" href="#" id="page_number"></a></li>
+                      <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <button class="btn" id="openPopupBtn">Open Pop-up</button>
+    </div>
+    
+    <script type="text/javascript">
+        let foodstucks  = {{ list_food_stucks|tojson }}
+        const foodstucks_size = Object.keys(foodstucks).length;
+
+        let i = 0
+        for (let idx = 0; idx < 8; idx++) {
+            document.getElementById("page_number").innerHTML = i+1;
+            //const paragraph = document.createElement(foodstucks[i].label);
+            document.getElementById("foodstuck_label_"+ idx).innerHTML = foodstucks[i*8+idx].label;
+            document.getElementById("foodstuck_button_"+ idx).addEventListener("click", function() {
+                
+                const selectedProduct = foodstucks[(i*8+idx)%foodstucks_size].label;
+
+                // Create a new list item
+                const listItem = document.createElement('li');
+                listItem.textContent = selectedProduct;
+
+                // Add the new list item to the product list
+                document.getElementById('productList').appendChild(listItem);
+            });
+            
+        }
+
+        const prevButton = document.querySelector('.page-link[aria-label="Previous"]');
+        const nextButton = document.querySelector('.page-link[aria-label="Next"]');
+
+        // Ajouter des gestionnaires d'événements pour les clics
+        prevButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (i==0) {
+                return;
+            }
+            i -= 1
+            document.getElementById("page_number").innerHTML = i+1;
+            for (let idx = 0; idx < 8; idx++) {
+        
+                //const paragraph = document.createElement(foodstucks[i].label);
+                document.getElementById("foodstuck_label_"+ idx).innerHTML = foodstucks[(i*8+idx)%foodstucks_size].label;
+            }
+            
+        });
+
+        nextButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            
+            i += 1
+            document.getElementById("page_number").innerHTML = i+1;
+            for (let idx = 0; idx < 8; idx++) {
+                
+                //const paragraph = document.createElement(foodstucks[i].label);
+                document.getElementById("foodstuck_label_"+ idx).innerHTML = foodstucks[(i*8+idx)%foodstucks_size].label;
+            }
+        });
+
+
         document.getElementById("computeButton").addEventListener("click", function() {
             window.location.href = "/meal_resume";
         });
+
+    
     </script>
+
+    
 {% endblock %}

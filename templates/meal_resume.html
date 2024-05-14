@@ -6,11 +6,20 @@
     <button id="ok">Ok</button>
     {% if haveSession %}
         <button id="favorite_meal_button">Save in your favorite meal only if have an account</button>
-    {% endif %}
+        <script>
+            document.getElementById("ok").addEventListener("click", function() {
+                window.location.href = "/user_page";
+            });
+        </script>
+    {% else %}
     <script>
         document.getElementById("ok").addEventListener("click", function() {
             window.location.href = "/foodstuffs_selection";
         });
+    </script>
+    {% endif %}
+    
+    <script>
         document.getElementById("favorite_meal_button").addEventListener("click", function() {
             
         });
