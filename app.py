@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, session
+from flask import Flask, redirect, url_for, render_template, request, session, jsonify
 
 app = Flask(__name__)
 app.secret_key = "Secret_key"
@@ -66,8 +66,18 @@ def foodstuffs_selection():
                         {'label':"Brocoli", 'image_link':url_for('static', filename='images/Default_image.png')}]
     return render_template("foodstuffs_selection.html", list_food_stucks = list_food_stucks)
 
-@app.route("/meal_resume")
+@app.route("/meal_resume", methods=["POST", "GET"])
 def meal_resume():
+    if request.method == "POST":
+        data = request.get_json()
+        print("Données reçues : ", data)
+
+        # Réponse en JSON
+        response = {
+            'message': 'Données reçues avec succès',
+            'received_data': data
+        }
+        return jsonify(response)
     if ("username" in session):
         return render_template("meal_resume.html", haveSession=True)
     return render_template("meal_resume.html", haveSession=False)
