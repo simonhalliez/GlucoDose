@@ -48,8 +48,22 @@ def account_creation():
 @app.route("/foodstuffs_selection")
 def foodstuffs_selection():
     list_food_stucks = [{'label':"Tomato", 'image_link':"https://img.freepik.com/vecteurs-libre/tomates-fraiches_1053-566.jpg?w=740&t=st=1715677134~exp=1715677734~hmac=8d8bd9c4ab06aad73268c77d7ad362ce392f8fc6df666bb9ddd0a342f7850348"},
-                        {'label':"Potato"},{'label':"Beens"}, {'label':"Banana"},{'label':"Maize"},{'label':"Stawberry"},{'label':"Ketchup"}, {'label':"Salad"},
-                        {'label':"Porc"},{'label':"Veau"},{'label':"Poisson"},{'label':"Chocapic"},{'label':"Durum"},{'label':'Pate'},{'label':"Fromage"},{'label':"Tartine"},{'label':"Brocoli"}]
+                        {'label':"Potato",'image_link':"https://lesrecoltesmarcotteboutique.com/cdn/shop/products/shutterstock_1073870363_600x.jpg?v=1587143918"},
+                        {'label':"Beens", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Banana", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Maize", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Stawberry", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Ketchup", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Salad", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Porc", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Veau", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Poisson", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Chocapic", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Durum", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':'Pate', 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Fromage", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Tartine", 'image_link':url_for('static', filename='images/Default_image.png')},
+                        {'label':"Brocoli", 'image_link':url_for('static', filename='images/Default_image.png')}]
     return render_template("foodstuffs_selection.html", list_food_stucks = list_food_stucks)
 
 @app.route("/meal_resume")

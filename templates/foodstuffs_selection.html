@@ -1,130 +1,229 @@
 {% extends "base.html" %}
 {% block title %}Select your foodstuffs{% endblock %}
 {% block body %}
-    
-    <div class="container-fluid">
 
-        <h1>Select your foodstuffs</h1>
-        <div class="row">
-            <div class="col-md-3">
-                <h2>Your meal</h2>
-                <p>Contenu de la colonne de gauche.</p>
-                <ul id="productList" class="product-list"></ul>
-                <p id="test"> </p>
-                <button id="computeButton">Compute</button>
-            </div>
-            <div class="col-md-9">
-                <div class="row my-3">
-                    {% for idx_str in ["0","1","2","3","4","5","6","7"] %}
-                    
-                        <div class="col-sm-3 my-3">
-                            <div class="row mb-1">
-                                <div class="col">
-                                    <img src="https://img.freepik.com/vecteurs-libre/tomates-fraiches_1053-566.jpg?w=740&t=st=1715677134~exp=1715677734~hmac=8d8bd9c4ab06aad73268c77d7ad362ce392f8fc6df666bb9ddd0a342f7850348" alt="Image not Found" class="img-thumbnail">
-                                </div>
-                            </div>
-                            <div class="row mb-1">
-                                <div class="col">
-                                    <p class="text-center" id={{ "foodstuck_label_"+idx_str }}></p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <button type="button" class="btn btn-success align-self-end" id={{ "foodstuck_button_"+idx_str }} >Add</button>
-                                    
-                                </div>
-                            </div>
-                            
-                        </div>
-                    
-                    {% endfor %}
-                    
+<div class="container-fluid">
+
+    <h1>Select your foodstuffs</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <h2>Your meal</h2>
+            <p>Contenu de la colonne de gauche.</p>
+            <!-- <ul id="productList" class="product-list"></ul> -->
+            <ul class="list-group" id="productList"></ul>
+            <button id="computeButton">Compute</button>
+        </div>
+        <div class="col-md-9">
+
+
+            <form>
+                <div class="form-group row">
+
+                    <label for="inputGlucosLevel" class="col-sm-3 col-form-label text-right">Glucose Level (in
+                        mg/dL):</label>
+                    <div class="col-sm-2">
+                        <input type="number" class="form-control" id="glucose_level" placeholder="0" step="0.1">
+                    </div>
 
                 </div>
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                      <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Previous">
-                          <span aria-hidden="true">&laquo;</span>
-                        </a>
-                      </li>
-                      <li class="page-item"><a class="page-link" href="#" id="page_number"></a></li>
-                      <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
-                          <span aria-hidden="true">&raquo;</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
+            </form>
+            <div class="row my-3">
+                {% for idx_str in ["0","1","2","3","4","5","6","7"] %}
+
+                <div class="col-sm-3 my-3">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <img id={{ "foodstuck_image_" +idx_str }} alt="Image not Found" class="img-thumbnail">
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="text-center" id={{ "foodstuck_label_" +idx_str }}></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="text-right">
+                                <button type="button" class="btn btn-success align-self-end"
+                                    id={{ "foodstuck_button_add_" +idx_str }} data-toggle="modal"
+                                    data-target={{ "#Modal_" +idx_str }}>Add</button>
+                                <!-- Modal -->
+                                <div class="modal fade" id={{ "Modal_" +idx_str }} tabindex="-1" role="dialog"
+                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id={{ "Modal_title_" +idx_str }}></h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form>
+                                                    <div class="form-group row">
+
+                                                        <label for="inputGlucosLevel"
+                                                            class="col-sm-9 col-form-label text-left">Enter the
+                                                            amount:</label>
+                                                        <div class="col-sm-3 text-right">
+                                                            <input type="number" class="form-control" id={{ "amount_"
+                                                                +idx_str }} placeholder="0" step="1">
+                                                        </div>
+
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-success" data-dismiss="modal"
+                                                    id={{ "foodstuck_button_confirm_" +idx_str }}>Confirm</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+
             </div>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#" id="page_number"></a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
-    
-    <div class="container">
-        <button class="btn" id="openPopupBtn">Open Pop-up</button>
-    </div>
-    
-    <script type="text/javascript">
-        let foodstucks  = {{ list_food_stucks|tojson }}
-        const foodstucks_size = Object.keys(foodstucks).length;
+</div>
 
-        let i = 0
+<script type="text/javascript">
+    let foodstucks = {{ list_food_stucks| tojson }}
+    const foodstucks_size = Object.keys(foodstucks).length;
+    const selected_foodstucks = new Map();
+
+    let i = 0
+    for (let idx = 0; idx < 8; idx++) {
+        document.getElementById("page_number").innerHTML = i + 1;
+        //const paragraph = document.createElement(foodstucks[i].label);
+        document.getElementById("Modal_title_" + idx).innerHTML = "Amount of " + foodstucks[i * 8 + idx].label;
+        document.getElementById("foodstuck_label_" + idx).innerHTML = foodstucks[i * 8 + idx].label;
+        document.getElementById("foodstuck_image_" + idx).src = foodstucks[i * 8 + idx].image_link;
+        document.getElementById("foodstuck_button_confirm_" + idx).addEventListener("click", function () {
+
+            const selectedProduct = foodstucks[(i * 8 + idx) % foodstucks_size].label;
+
+            if (selected_foodstucks.has(selectedProduct)) {
+                throw new Error("Should not be able to add an element that is already in the list");
+            }
+
+            const amount = document.getElementById("amount_" + idx).value;
+
+            selected_foodstucks.set(selectedProduct, amount);
+
+            // Create a new list item
+            var li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+            var text = document.createTextNode(amount + " " + selectedProduct );
+            li.appendChild(text);
+
+            var btn1 = document.createElement('button');
+            btn1.className = 'btn btn-success btn-sm';
+            btn1.innerText = 'Modifie';
+            btn1.onclick = function() {
+                alert('Bouton 1 cliqué');
+            };
+
+            var btn2 = document.createElement('button');
+            btn2.className = 'btn btn-danger btn-sm';
+            btn2.innerText = 'Delete';
+            btn2.onclick = function() {
+                alert('Bouton 2 cliqué');
+            };
+
+            li.appendChild(btn1);
+            li.appendChild(btn2);
+
+            // Add the new list item to the product list
+            document.getElementById('productList').appendChild(li);
+
+            const button = document.getElementById("foodstuck_button_add_" + idx);
+            button.disabled = true;
+        });
+
+    }
+
+    const prevButton = document.querySelector('.page-link[aria-label="Previous"]');
+    const nextButton = document.querySelector('.page-link[aria-label="Next"]');
+
+
+    prevButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        if (i == 0) {
+            return;
+        }
+        i -= 1
+        document.getElementById("page_number").innerHTML = i + 1;
         for (let idx = 0; idx < 8; idx++) {
-            document.getElementById("page_number").innerHTML = i+1;
+
+            foodstucks_label = foodstucks[(i * 8 + idx) % foodstucks_size].label
+            if (selected_foodstucks.has(foodstucks_label)) {
+                document.getElementById("foodstuck_button_add_" + idx).disabled = true;
+            } else {
+                document.getElementById("foodstuck_button_add_" + idx).disabled = false;
+            }
             //const paragraph = document.createElement(foodstucks[i].label);
-            document.getElementById("foodstuck_label_"+ idx).innerHTML = foodstucks[i*8+idx].label;
-            document.getElementById("foodstuck_button_"+ idx).addEventListener("click", function() {
-                
-                const selectedProduct = foodstucks[(i*8+idx)%foodstucks_size].label;
-
-                // Create a new list item
-                const listItem = document.createElement('li');
-                listItem.textContent = selectedProduct;
-
-                // Add the new list item to the product list
-                document.getElementById('productList').appendChild(listItem);
-            });
-            
+            document.getElementById("foodstuck_label_" + idx).innerHTML = foodstucks_label;
+            document.getElementById("Modal_title_" + idx).innerHTML = "Amount of " + foodstucks_label;
+            document.getElementById("amount_" + idx).value = 0;
+            document.getElementById("foodstuck_image_" + idx).src = foodstucks[(i * 8 + idx) % foodstucks_size].image_link;
         }
 
-        const prevButton = document.querySelector('.page-link[aria-label="Previous"]');
-        const nextButton = document.querySelector('.page-link[aria-label="Next"]');
+    });
 
-        // Ajouter des gestionnaires d'événements pour les clics
-        prevButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            if (i==0) {
-                return;
+    nextButton.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        i += 1
+        document.getElementById("page_number").innerHTML = i + 1;
+        for (let idx = 0; idx < 8; idx++) {
+
+            foodstucks_label = foodstucks[(i * 8 + idx) % foodstucks_size].label
+            if (selected_foodstucks.has(foodstucks_label)) {
+                document.getElementById("foodstuck_button_add_" + idx).disabled = true;
+            } else {
+                document.getElementById("foodstuck_button_add_" + idx).disabled = false;
             }
-            i -= 1
-            document.getElementById("page_number").innerHTML = i+1;
-            for (let idx = 0; idx < 8; idx++) {
-        
-                //const paragraph = document.createElement(foodstucks[i].label);
-                document.getElementById("foodstuck_label_"+ idx).innerHTML = foodstucks[(i*8+idx)%foodstucks_size].label;
-            }
-            
-        });
-
-        nextButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            
-            i += 1
-            document.getElementById("page_number").innerHTML = i+1;
-            for (let idx = 0; idx < 8; idx++) {
-                
-                //const paragraph = document.createElement(foodstucks[i].label);
-                document.getElementById("foodstuck_label_"+ idx).innerHTML = foodstucks[(i*8+idx)%foodstucks_size].label;
-            }
-        });
+            //const paragraph = document.createElement(foodstucks[i].label);
+            document.getElementById("foodstuck_label_" + idx).innerHTML = foodstucks_label;
+            document.getElementById("Modal_title_" + idx).innerHTML = "Amount of " + foodstucks_label;
+            document.getElementById("amount_" + idx).value = 0;
+            document.getElementById("foodstuck_image_" + idx).src = foodstucks[(i * 8 + idx) % foodstucks_size].image_link;
+        }
+    });
 
 
-        document.getElementById("computeButton").addEventListener("click", function() {
-            window.location.href = "/meal_resume";
-        });
+    document.getElementById("computeButton").addEventListener("click", function () {
+        window.location.href = "/meal_resume";
+    });
 
-    
-    </script>
 
-    
+</script>
+
+
 {% endblock %}
