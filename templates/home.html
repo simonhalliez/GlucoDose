@@ -1,19 +1,74 @@
 {% extends "base.html" %}
-{% block title %}Name of the app{% endblock %}
+{% block head %}
+
+<title>Name of the app</title>
+<style>
+    body {
+        background-color: white;
+        position: relative;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .circle {
+        position: absolute;
+        width: 1000px;
+        height: 1000px;
+        background-color: #fce942;
+        /* Pale yellow color */
+        border-radius: 50%;
+        top: 50%;
+        left: 0%;
+        transform: translate(-50%, -50%);
+    }
+
+    .btn-custom {
+        background-color: #e8d633;
+        /* Pale yellow color */
+        border: none;
+        color: black;
+        width: 200px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+
+    .btn-custom:hover {
+        background-color: #FFEFD5;
+        /* Lightening the color on hover */
+    }
+
+    .container-custom {
+        z-index: 1;
+    }
+</style>
+{% endblock %}
 {% block body %}
-    <h1>Name of the app</h1>
-    <button id="sign_in" methode >Sign in</button>
-    <button id="account_creation">Create an account</button>
-    <button id="no_account">No account</button>
-    <script>
-        document.getElementById("sign_in").addEventListener("click", function() {
-            window.location.href = "/sign_in";
-        });
-        document.getElementById("account_creation").addEventListener("click", function() {
-            window.location.href = "/account_creation";
-        });
-        document.getElementById("no_account").addEventListener("click", function() {
-            window.location.href = "/foodstuffs_selection";
-        });
-    </script>
+<div class="circle"></div>
+<div class="container container-custom">
+    <h1 class="mb-4">Easily calculate the dose of insulin to inject with GlucoDose</h1>
+    <div class="row justify-content-center mb-3">
+        <button id="sign_in" class="btn btn-custom">Sign in</button>
+    </div>
+    <div class="row justify-content-center mb-3">
+        <button id="account_creation" class="btn btn-custom">Create an account</button>
+    </div>
+    <div class="row justify-content-center mb-3">
+        <button id="no_account" class="btn btn-custom">No account</button>
+    </div>
+</div>
+<script>
+    document.body.style.overflow = 'hidden';
+    document.getElementById("sign_in").addEventListener("click", function () {
+        window.location.href = "/sign_in";
+    });
+    document.getElementById("account_creation").addEventListener("click", function () {
+        window.location.href = "/account_creation";
+    });
+    document.getElementById("no_account").addEventListener("click", function () {
+        window.location.href = "/foodstuffs_selection";
+    });
+</script>
 {% endblock %}

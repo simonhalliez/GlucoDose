@@ -1,5 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Select your foodstuffs{% endblock %}
+
+{% block head %}
+<title>Select your foodstuffs</title>
+{% endblock %}
+
 {% block body %}
 
 <div class="container-fluid">
@@ -7,7 +11,7 @@
     <h1>Select your foodstuffs</h1>
     <div class="row">
         <div class="col-md-3">
-            <div     class="text-center">
+            <div class="text-center">
                 <h2>Your meal</h2>
                 <ul class="list-group mb-3" id="productList"></ul>
                 <button class="btn btn-success btn-lg" id="computeButton">Compute</button>
@@ -22,7 +26,7 @@
                     <label for="inputGlucosLevel" class="col-sm-3 col-form-label text-right">Glucose Level (in
                         mg/dL):</label>
                     <div class="col-sm-2">
-                        <input type="number" class="form-control" id="glucose_level" placeholder="0" step="0.1">
+                        <input type="number" class="form-control" id="glucose_level" placeholder="0" step="0.1" min="0.001">
                     </div>
 
                 </div>
@@ -102,15 +106,26 @@
         }
     }
 
+    function simpleHashString(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return hash;
+    }
+
     function showModal(selectedProduct) {
         var modalId = 'dynamicModal';
+        var hashProduct = simpleHashString(selectedProduct)
         var modalHTML = `
-            <div class="modal fade" id=${"Modal_" + selectedProduct} tabindex="-1" role="dialog"
+            <div class="modal fade" id=${"Modal_" + hashProduct} tabindex="-1" role="dialog"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id=${"Modal_title_" + selectedProduct}"Modal_title_0">${"Amount of "+selectedProduct}</h5>
+                            <h5 class="modal-title" id=${"Modal_title_" + hashProduct}"Modal_title_0">${"Amount of " + selectedProduct}</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -122,8 +137,8 @@
                                     <label for="inputGlucosLevel" class="col-sm-9 col-form-label text-left">Enter the
                                         amount:</label>
                                     <div class="col-sm-3 text-right">
-                                        <input type="number" class="form-control" id=${"amount_" + selectedProduct}
-                                            placeholder="0" step="1">
+                                        <input type="number" class="form-control" id=${"amount_" + hashProduct}
+                                            placeholder="0" step="1" min="0">
                                     </div>
 
                                 </div>
@@ -131,7 +146,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-success" data-dismiss="modal"
-                                id=${"foodstuck_button_confirm_" + selectedProduct}>Confirm</button>
+                                id=${"foodstuck_button_confirm_" + hashProduct}>Confirm</button>
 
                         </div>
                     </div>
@@ -139,10 +154,10 @@
             </div>`;
 
         document.getElementById('dynamicModalsContainer').innerHTML = modalHTML;
-        $('#' + "Modal_" + selectedProduct).modal('show');
+        $('#' + "Modal_" + hashProduct).modal('show');
 
-        document.getElementById("foodstuck_button_confirm_" + selectedProduct).addEventListener("click", function() {
-            const amount = document.getElementById("amount_" + selectedProduct).value;
+        document.getElementById("foodstuck_button_confirm_" + hashProduct).addEventListener("click", function () {
+            const amount = document.getElementById("amount_" + hashProduct).value;
 
             // If already exist, it only modifie the text.
             if (selected_foodstucks.has(selectedProduct)) {
@@ -186,7 +201,7 @@
             document.getElementById('productList').appendChild(li);
             updateTheFoodStuckDisplay()
 
-            
+
         });
     }
 
@@ -195,10 +210,8 @@
         document.getElementById("foodstuck_label_" + idx).innerHTML = foodstucks[i * 8 + idx].label;
         document.getElementById("foodstuck_image_" + idx).src = foodstucks[i * 8 + idx].image_link;
         document.getElementById("foodstuck_button_add_" + idx).addEventListener("click", function () {
-
-        const selectedProduct = foodstucks[(i * 8 + idx) % foodstucks_size].label;
-        showModal(selectedProduct);
-            
+            const selectedProduct = foodstucks[(i * 8 + idx) % foodstucks_size].label;
+            showModal(selectedProduct);
 
         });
 
@@ -228,7 +241,7 @@
 
     document.getElementById("computeButton").addEventListener("click", function () {
         const glucose_level = document.getElementById("glucose_level").value;
-        if (glucose_level==0) {
+        if (glucose_level == 0) {
             alert("Complete your glucose level.");
             return;
         }
@@ -236,19 +249,19 @@
             alert("Select at least one element.");
             return;
         }
-        selected_foodstucks.set("glucose_level",glucose_level);
+        selected_foodstucks.set("glucose_level", glucose_level);
         const arr = Array.from(selected_foodstucks.entries());
 
         // Convertir le tableau en JSON
         const json = JSON.stringify(arr);
-        
+
         fetch('/meal_resume', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: json
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: json
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Erreur de réseau');
