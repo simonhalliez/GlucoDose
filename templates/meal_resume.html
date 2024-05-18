@@ -137,7 +137,7 @@
             <div class="modal-body">
                 <form>
                     <div class="form-group row">
-                        <label for="NameOfMeal" class="col-sm-7 col-form-label text-left">Enter the name of your meal:</label>
+                        <label class="col-sm-7 col-form-label text-left">Enter the name of your meal:</label>
                         <div class="col-sm-5 text-right">
                             <input type="text" class="form-control" id="formNameOfMeal">
                         </div>
@@ -251,12 +251,14 @@
     });
 
     async function calculateInsulin() {
+        
         try {
             const insulinData = {
                 glucose_level: 34, // Example value
                 glucose_goal: 34, // Example value
                 insulin_sensitivity: 3 // Example value
             };
+            
 
             const response = await fetch('/api/v1/insulin/compute', {
                 method: 'POST',
@@ -265,17 +267,20 @@
                 },
                 body: JSON.stringify(insulinData)
             });
-
+            
             if (!response.ok) {
                 throw new Error('Failed to calculate insulin');
             }
 
             const data = await response.json();
             document.getElementById('insulinInjection').innerHTML = `${data.Insulin}`;
+            
         } catch (error) {
+            
             document.getElementById('insulinInjection').innerText = 'Error: ' + error.message;
         }
     }
+    
 
     document.addEventListener('DOMContentLoaded', calculateInsulin);
 </script>
