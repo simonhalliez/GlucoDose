@@ -86,11 +86,11 @@ def sign_in():
         password = request.form["password"]
         # session is like a python dico specific to the user and accessible every where in the back end
         session["username"] = username
-        return redirect(url_for("user_page"))
+        return redirect("/user_page")
     else:
         # if already have a session -> go to user page
         if "username" in session:
-            return redirect(url_for("user_page"))
+            return redirect("/user_page")
         return render_template("sign_in.html")
 
 
@@ -103,7 +103,7 @@ def user_page():
         return render_template("user_page.html", user=username)
     else:
         # no session -> go to sign in
-        return redirect(url_for("sign_in"))
+        return redirect("/sign_in")
 
 
 @home_blueprint.route("/account_creation", methods=["POST", "GET"])
@@ -112,7 +112,7 @@ def account_creation():
         print("Account")
         username = request.form["username"]
         password = request.form["password"]
-        return redirect(url_for("sign_in"))
+        return redirect("/sign_in")
     return render_template("account_creation.html")
 
 
@@ -123,31 +123,21 @@ def foodstuffs_selection():
     for index, row in data.iterrows():
         list_food_stucks.append(
             {'label': row['Food'], 'carbs': row['Carbs'], 'image_link': url_for('static', filename='images/Default_image.png')})
-    # list_food_stucks = [{'label':"Tomato", 'image_link':"https://img.freepik.com/vecteurs-libre/tomates-fraiches_1053-566.jpg?w=740&t=st=1715677134~exp=1715677734~hmac=8d8bd9c4ab06aad73268c77d7ad362ce392f8fc6df666bb9ddd0a342f7850348"},
-    #                     {'label':"Potato",'image_link':"https://lesrecoltesmarcotteboutique.com/cdn/shop/products/shutterstock_1073870363_600x.jpg?v=1587143918"},
-    #                     {'label':"Beens", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Banana", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Maize", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Stawberry", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Ketchup", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Salad", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Porc", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Veau", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Poisson", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Chocapic", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Durum", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':'Pate', 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Fromage", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Tartine", 'image_link':url_for('static', filename='images/Default_image.png')},
-    #                     {'label':"Brocoli", 'image_link':url_for('static', filename='images/Default_image.png')}]
     return render_template("foodstuffs_selection.html", list_food_stucks=list_food_stucks)
 
 
 @home_blueprint.route("/meal_resume", methods=["POST", "GET"])
 def meal_resume():
     if request.method == "POST":
+
         data = request.get_json()
-        print("Données reçues : ", data)
+        print(data)
+        if not data or 'glucose_level' not in data or 'glucose_goal' not in data or 'insulin_sensitivity' not in data:
+            return jsonify({"error": "Invalid input"}), 400
+
+        session["glucose_level"] = data['glucose_level']
+        session["glucose_goal"] = data['glucose_goal']
+        session["insulin_sensitivity"] = data['insulin_sensitivity']
 
         # Réponse en JSON
         response = {
@@ -163,4 +153,4 @@ def meal_resume():
 @home_blueprint.route("/log_out")
 def log_out():
     session.pop("username", None)
-    return redirect(url_for("home"))
+    return redirect("/home")
