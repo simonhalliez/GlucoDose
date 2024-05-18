@@ -229,7 +229,7 @@ function displayResults(data) {
 
                 <button type="button" class="btn btn-success align-self-end"
                         id="foodstuck_button_add_${food.food_id}" data-toggle="modal"
-                        onclick="addIngredient(${food.food_id}, '${food.food_name}')">Add</button>
+                        onclick="addIngredient(${food.food_id}, '${food.food_name}', '${food.food_description}')">Add</button>
 
                 <input type=number placeholder="amount in grams" id="foodstuck_input_add_${food.food_id}" min=0 />
 
@@ -243,10 +243,20 @@ function displayResults(data) {
     }
 }
 
+function extractNutritionInfo(description) {
+    const kcalMatch = description.match(/Calories:\s*([\d.]+)kcal/);
+    const carbsMatch = description.match(/Carbs:\s*([\d.]+)g/);
+
+    const kcalPer100g = kcalMatch ? parseFloat(kcalMatch[1]) : 0;
+    const carbsPer100g = carbsMatch ? parseFloat(carbsMatch[1]) : 0;
+
+    return { kcalPer100g, carbsPer100g };
+}
+
 const selectedFoodstuffs = new Map();
 
-function addIngredient(foodId, foodName) {
-    const amountInput = document.getElementById(`foodstuck_input_add_${foodId}`);
+function addIngredient(foodId, foodName, foodDescription) {
+     const amountInput = document.getElementById(`foodstuck_input_add_${foodId}`);
     const amount = amountInput.value;
 
     if (!amount || amount <= 0) {
@@ -254,36 +264,69 @@ function addIngredient(foodId, foodName) {
         return;
     }
 
-    const selectedProduct = foodName;
+    const { kcalPer100g, carbsPer100g } = extractNutritionInfo(foodDescription);
 
-    if (selectedFoodstuffs.has(selectedProduct)) {
-        document.getElementById('selected_list_' + selectedProduct).childNodes[0].nodeValue = amount + " " + selectedProduct;
-        selectedFoodstuffs.set(selectedProduct, amount);
-        return;
-    }
+    const selectedProduct = {
+        id: foodId,
+        label: foodName,
+        amount: parseFloat(amount),
+        kcal: (kcalPer100g / 100) * parseFloat(amount),
+        carbs: (carbsPer100g / 100) * parseFloat(amount)
+    };
 
-    selectedFoodstuffs.set(selectedProduct, amount);
+    selectedFoodstuffs.set(foodId, selectedProduct);
+
+    // Sauvegarder les données dans la session
+    fetch('/save-ingredient', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ selectedProduct })
+    }).then(response => {
+        if (response.ok) {
+            console.log('Ingredient saved to session');
+        } else {
+            console.log('Failed to save ingredient to session');
+        }
+    });
 
     // Créer un nouvel élément de liste
     const li = document.createElement('li');
     li.className = 'list-group-item d-flex justify-content-between align-items-center';
-    li.id = 'selected_list_' + selectedProduct;
-    var text = document.createTextNode(amount + " " + selectedProduct);
+    li.id = 'selected_list_' + foodId;
+    var text = document.createTextNode(amount + "g " + foodName);
     li.appendChild(text);
 
     var btn2 = document.createElement('button');
     btn2.className = 'btn btn-danger btn-sm';
     btn2.innerText = 'Delete';
     btn2.onclick = function () {
-        if (selectedFoodstuffs.has(selectedProduct)) {
-            selectedFoodstuffs.delete(selectedProduct);
+        if (selectedFoodstuffs.has(foodId)) {
+            selectedFoodstuffs.delete(foodId);
         }
         li.parentNode.removeChild(li);
         updateTheFoodStuckDisplay();
+
+        // Supprimer l'ingrédient de la session
+        fetch('/delete-ingredient', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: foodId })
+        }).then(response => {
+            if (response.ok) {
+                console.log('Ingredient removed from session');
+            } else {
+                console.log('Failed to remove ingredient from session');
+            }
+        });
     };
 
     li.appendChild(btn2);
 
     // Ajouter le nouvel élément de liste à la liste des produits
     document.getElementById('productList').appendChild(li);
+    updateTheFoodStuckDisplay();
 }

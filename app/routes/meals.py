@@ -14,7 +14,8 @@ def create_meal_combination():
     meal_combination = {
         "type": "meal_combination",
         "name": data['name'],
-        "ingredients": data['ingredients']
+        "ingredients": data['ingredients'],
+        "userId": data["userId"]
     }
     db.save(meal_combination)
     return jsonify({"message": "Meal combination created successfully"}), 201

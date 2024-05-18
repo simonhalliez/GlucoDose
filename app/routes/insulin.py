@@ -1,31 +1,71 @@
 import couchdb
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, session
 from app.models import Ingredient, InsulinCalculation
 
 insulin_blueprint = Blueprint('insulin', __name__)
 
 
+def calculate_insulin_dose(blood_glucose_level, target_glucose_level, sensitivity_factor, carbs_intake,
+                           insulin_to_carb_ratio):
+    """
+    Calculate the total insulin dosage based on blood glucose level, target glucose level, sensitivity factor, carbohydrate intake, and insulin-to-carb ratio.
+
+    Parameters:
+    blood_glucose_level (float): The current blood glucose level of the patient (mg/dl or mmol/l).
+    target_glucose_level (float): The desired blood glucose level (given by doctor, mg/dl or mmol/l).
+    sensitivity_factor (float): The expected decrease in blood glucose level per unit of insulin (given by doctor, mg/dl per unit or mmol/l per unit).
+    carbs_intake (float): The amount of carbohydrate intake in grams.
+    insulin_to_carb_ratio (float): The amount of insulin needed per gram of carbohydrate (e.g., ratio 1:15).
+
+    Returns:
+    float: The total insulin dosage.
+    """
+
+    # Calculate correction dose
+    correction_dose = (blood_glucose_level - target_glucose_level) / sensitivity_factor
+
+    # Calculate meal dose (insulin needed for carbohydrate intake)
+    meal_dose = carbs_intake * insulin_to_carb_ratio
+
+    # Total insulin dose
+    total_insulin_dose = correction_dose + meal_dose
+
+    return total_insulin_dose
+
+
 @insulin_blueprint.route('/compute', methods=['POST'])
 def compute_insulin():
-    data = request.get_json()
-    if not data or 'ingredients' not in data:
+    ingredientsSession = session.get('ingredients', [])
+
+    if not ingredientsSession:
         return jsonify({"error": "Invalid input"}), 400
 
-    ingredients_data = data['ingredients']
-    ingredients = []
-    for item in ingredients_data:
-        try:
-            name = item['name']
-            quantity = item['quantity']
-            ingredient = Ingredient(name, quantity)
-            ingredients.append(ingredient)
-        except KeyError:
-            return jsonify({"error": "Invalid ingredient format"}), 400
+    ingredients_data = ingredientsSession
 
-    insulin_calc = InsulinCalculation(ingredients)
-    insulin_dose = insulin_calc.calculate_insulin_dose()
+    data = request.get_json()
+    if not data or 'glucose_level' not in data or 'glucose_goal' not in data or 'insulin_sensitivity' not in data:
+        return jsonify({"error": "Invalid input"}), 400
 
-    return jsonify({"total_insulin_dose": insulin_dose}), 200
+    glucose_level = data['glucose_level']
+    glucose_goal = data['glucose_goal']
+    insulin_sensitivity = data['insulin_sensitivity']
+
+    total_carbs = sum(item['carbs'] for item in ingredients_data)
+
+    insulin_dose = calculate_insulin_dose(
+        blood_glucose_level=glucose_level,
+        target_glucose_level=glucose_goal,
+        sensitivity_factor=insulin_sensitivity,
+        carbs_intake=total_carbs,
+        insulin_to_carb_ratio=1 / insulin_sensitivity
+    )
+
+    response = {
+        'Insulin': round(insulin_dose, 2),
+        'meal': ingredients_data
+    }
+
+    return jsonify(response), 200
 
 
 @insulin_blueprint.route('/combinations', methods=['POST'])

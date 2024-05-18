@@ -2,6 +2,8 @@ class Ingredient:
     def __init__(self, name, quantity):
         self.name = name
         self.quantity = quantity
+        self.carbs = None
+        self.kcal = None
 
 
 class InsulinCalculation:
@@ -44,14 +46,16 @@ class InsulinCalculation:
 
 
 class MealCombination:
-    def __init__(self, name, ingredients):
+    def __init__(self, name, ingredients, userId):
         self.name = name
+        self.userId = userId
         self.ingredients = ingredients
 
     def to_dict(self):
         return {
             "name": self.name,
-            "ingredients": self.ingredients
+            "ingredients": self.ingredients,
+            "userId": self.userId
         }
 
 # class User:

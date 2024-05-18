@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 import couchdb
 
@@ -5,6 +7,7 @@ import couchdb
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
     app.config.from_pyfile('../.env')
+    app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')
 
     # Connexion à CouchDB
     couch = couchdb.Server(app.config['COUCHDB_SERVER'])

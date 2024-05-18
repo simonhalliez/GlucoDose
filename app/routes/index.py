@@ -31,6 +31,19 @@ def home():
     return render_template("home.html")
 
 
+@home_blueprint.route('/get-session-ingredients', methods=['GET'])
+def get_session_ingredients():
+    ingredients = session.get('ingredients', [])
+    return jsonify({"ingredients": ingredients})
+
+
+@home_blueprint.route('/reset-ingredients', methods=['POST'])
+def reset_ingredients():
+    session.pop('ingredients', None)
+    session.modified = True
+    return jsonify({"message": "Ingredients reset"}), 200
+
+
 @home_blueprint.route('/search-food', methods=['POST'])
 def search_food():
     query = request.json.get('query')
@@ -44,6 +57,25 @@ def search_food():
     response = requests.post(search_url, headers=headers, data=data)
     response.raise_for_status()
     return jsonify(response.json())
+
+
+@home_blueprint.route('/save-ingredient', methods=['POST'])
+def save_ingredient():
+    ingredient = request.json.get('selectedProduct')
+    if 'ingredients' not in session:
+        session['ingredients'] = []
+    session['ingredients'].append(ingredient)
+    session.modified = True
+    return jsonify({"message": "Ingredient saved"}), 200
+
+
+@home_blueprint.route('/delete-ingredient', methods=['POST'])
+def delete_ingredient():
+    ingredient_id = request.json.get('id')
+    if 'ingredients' in session:
+        session['ingredients'] = [i for i in session['ingredients'] if i['id'] != ingredient_id]
+        session.modified = True
+    return jsonify({"message": "Ingredient deleted"}), 200
 
 
 @home_blueprint.route("/sign_in", methods=["POST", "GET"])
@@ -90,7 +122,7 @@ def foodstuffs_selection():
     list_food_stucks = []
     for index, row in data.iterrows():
         list_food_stucks.append(
-            {'label': row['Food'], 'image_link': url_for('static', filename='images/Default_image.png')})
+            {'label': row['Food'], 'carbs': row['Carbs'], 'image_link': url_for('static', filename='images/Default_image.png')})
     # list_food_stucks = [{'label':"Tomato", 'image_link':"https://img.freepik.com/vecteurs-libre/tomates-fraiches_1053-566.jpg?w=740&t=st=1715677134~exp=1715677734~hmac=8d8bd9c4ab06aad73268c77d7ad362ce392f8fc6df666bb9ddd0a342f7850348"},
     #                     {'label':"Potato",'image_link':"https://lesrecoltesmarcotteboutique.com/cdn/shop/products/shutterstock_1073870363_600x.jpg?v=1587143918"},
     #                     {'label':"Beens", 'image_link':url_for('static', filename='images/Default_image.png')},
