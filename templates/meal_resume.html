@@ -77,9 +77,9 @@
             document.getElementById("ok").addEventListener("click", function() {
                 window.location.href = "/user_page";
             });
-        
+
             document.getElementById("favorite_meal_button").addEventListener("click", function() {
-                
+
             });
         </script>
     {% else %}
@@ -100,7 +100,6 @@
                     <th>Label</th>
                     <th>Amount</th>
                     <th>Kcal</th>
-                    <th>Pourcentage</th>
                     <th>Carbohydrate</th>
                 </tr>
             </thead>
@@ -116,7 +115,7 @@
 
 
         <div class="col offset-md-5 col-md-3">
-            <p class="text-center rounded-border text-size"> Estimation of insuline injection: 50 ml</p>
+            <p class="text-center rounded-border text-size"> Estimation of insuline injection: <span id="insulinInjection">50</span> ml</p>
         </div>
         <div class="col col-md-1">
             <button class="rounded-border btn-lg" id="ok_button"> Ok</button>
@@ -148,33 +147,40 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="SaveMealButton" type="button" class="btn btn-success">Save the meal</button>
+                <button id="saveMealToFavourite" type="button" class="btn btn-success">Save the meal</button>
             </div>
         </div>
     </div>
 </div>
 <script>
+
+    let selectedFoodstuffs;
+
+    function populateTableFromSession() {
+        fetch('/get-session-ingredients')
+            .then(response => response.json())
+            .then(data => {
+                if (data.ingredients) {
+                    selectedFoodstuffs = data.ingredients;
+                    console.log(data.ingredients);
+                    populateTable(data.ingredients);
+                }
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        populateTableFromSession();
+    });
+
     // Example data
     let session = true;
     if(!session) {
         document.getElementById("SaveMealButton").visibility = "hidden";
     }
-    
+
     document.getElementById("ok_button").addEventListener("click", function () {
         window.location.href = "/foodstuffs_selection";
     })
-    const data = [
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Banana", "image_link": "static/images/Default_image.png", "amount": 4, "kcal": 100, "pourcentage": 50, "carbohydrate": 50 },
-        { "label": "Bread", "image_link": "static/images/Default_image.png", "amount": 1, "kcal": 200, "pourcentage": 50, "carbohydrate": 50 }
-    ];
 
     // Function to populate the table
     function populateTable(data) {
@@ -186,16 +192,91 @@
                     <td class="text-center">${item.label}</td>
                     <td class="text-center">${item.amount}</td>
                     <td class="text-center">${item.kcal}</td>
-                    <td class="text-center">${item.pourcentage}</td>
-                    <td class="text-center">${item.carbohydrate}</td>
+                    <td class="text-center">${item.carbs}</td>
                 `;
             tableBody.appendChild(row);
         });
     }
 
-    // Call the function to populate the table on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        populateTable(data);
+    async function saveMeal() {
+        const mealName = document.getElementById('formNameOfMeal').value;
+        if (!mealName) {
+            alert("Please enter a name for your meal.");
+            return;
+        }
+
+        const ingredients = Array.from(selectedFoodstuffs.values());
+
+        const mealData = {
+            name: mealName,
+            userId: 1,
+            ingredients: ingredients
+        };
+
+        try {
+            const response = await fetch('/api/v1/meals/combinations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mealData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save the meal');
+            }
+
+            alert("Meal saved successfully!");
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+
+    document.getElementById('saveMealToFavourite').addEventListener('click', saveMeal)
+
+    document.getElementById('ok_button').addEventListener('click', function () {
+        fetch('/reset-ingredients', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('Ingredients reset');
+                populateTable([]); // Clear the table
+            } else {
+                console.log('Failed to reset ingredients');
+            }
+        });
     });
+
+    async function calculateInsulin() {
+        try {
+            const insulinData = {
+                glucose_level: 34, // Example value
+                glucose_goal: 34, // Example value
+                insulin_sensitivity: 3 // Example value
+            };
+
+            const response = await fetch('/api/v1/insulin/compute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(insulinData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to calculate insulin');
+            }
+
+            const data = await response.json();
+            document.getElementById('insulinInjection').innerHTML = `${data.Insulin}`;
+        } catch (error) {
+            document.getElementById('insulinInjection').innerText = 'Error: ' + error.message;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateInsulin);
 </script>
 {% endblock %}
