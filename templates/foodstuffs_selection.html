@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Select your foodstuffs</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+    <h1>Select your foodstuffs</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="text-center">
+                <h2>Your meal</h2>
+                <ul class="list-group mb-3" id="productList"></ul>
+                <button class="btn btn-success btn-lg" id="computeButton">Compute</button>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <form>
+                <div class="form-group row">
+
+                    <label for="inputGlucosLevel" class="col-sm-3 col-form-label text-right">Glucose Level (in
+                        mg/dL):</label>
+                    <div class="col-sm-2">
+                        <input type="number" class="form-control" id="glucose_level" placeholder="0" step="0.1"
+                               min="0.001">
+                    </div>
+
+                </div>
+            </form>
+
+            <h3>Food Search via FatSecret API</h3>
+            <input type="text" id="searchQuery" placeholder="Enter food to search...">
+            <button onclick="searchFood()">Search</button>
+            <div id="results"></div>
+
+            <div class="row my-3">
+                {% for idx_str in ["0","1","2","3","4","5","6","7"] %}
+
+                <div class="col-sm-3 my-3">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <img id={{ "foodstuck_image_" +idx_str }} alt="Image not Found" class="img-thumbnail">
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="text-center" id={{ "foodstuck_label_" +idx_str }}></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="text-right">
+                                <button type="button" class="btn btn-success align-self-end"
+                                        id={{
+                                "foodstuck_button_add_" +idx_str }} data-toggle="modal"
+                                data-target={{ "#Modal_" +idx_str }}>Add</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+
+            </div>
+            <div id="dynamicModalsContainer"></div>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#" id="page_number"></a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script>let foodstucks = {{ list_food_stucks| tojson }}</script>
+<script src="{{ url_for('static', filename='js/food_selection.js') }}"></script>
+
+
+{% endblock %}

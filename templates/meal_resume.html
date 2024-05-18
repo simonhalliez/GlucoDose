@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Meal resume</title>
+<style>
+    .rounded-border-title {
+        border-radius: 15px;
+        /* Coins arrondis */
+        text-align: center;
+        /* Centrer le texte à l'intérieur du h1 */
+        background-color: #f1cd49;
+    }
+
+    th {
+        border: 2px solid rgb(160, 159, 159);
+        background-color: #dfdede;
+        /* Light grey background */
+        text-align: center;
+    }
+
+    tr {
+        background-color: white;
+    }
+
+    .img-column {
+        width: 150px;
+        /* Adjust the width as needed */
+    }
+
+    .img-cell img {
+        width: 100px;
+        /* Adjust the image size as needed */
+        height: auto;
+    }
+
+    .rounded-border {
+        background-color: rgb(160, 159, 159);
+        border-color: white;
+        border-radius: 15px;
+    }
+
+    .scrollable-table {
+        max-height: 400px;
+        /* Réglez la hauteur maximale que vous souhaitez pour votre tableau */
+        overflow-y: auto;
+        /* Ajoute une barre de défilement verticale si nécessaire */
+    }
+
+    .circle {
+        position: absolute;
+        width: 1000px;
+        height: 1000px;
+        background-color: #fce942;
+        /* Pale yellow color */
+        border-radius: 50%;
+        top: 10%;
+        left: 90%;
+        transform: translate(-50%, -50%);
+        z-index: -1;
+    }
+
+    .text-size {
+        font-size: 22px;
+        /* Adjust the value to change the text size */
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- <h1>Meal resume</h1>
+    <h2>The grid with details</h2>
+    <button id="ok">Ok</button>
+    {% if haveSession %}
+        <button id="favorite_meal_button">Save in your favorite meal only if have an account</button>
+        <script>
+            document.getElementById("ok").addEventListener("click", function() {
+                window.location.href = "/user_page";
+            });
+
+            document.getElementById("favorite_meal_button").addEventListener("click", function() {
+
+            });
+        </script>
+    {% else %}
+    <script>
+        document.getElementById("ok").addEventListener("click", function() {
+            window.location.href = "/foodstuffs_selection";
+        });
+    </script>
+    {% endif %} -->
+
+<div class="container">
+    <h1 class="text-center rounded-border-title my-3"> Resume of your meal</h1>
+    <div class="scrollable-table">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Label</th>
+                    <th>Amount</th>
+                    <th>Kcal</th>
+                    <th>Carbohydrate</th>
+                </tr>
+            </thead>
+            <tbody id="data-table-body">
+                <!-- Rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    <div class="row my-3">
+        <div class="col col-md-3 ">
+            <button id="SaveMealButton" class="rounded-border btn-lg" data-toggle="modal" data-target="#NameOfMeal">Save in your favorite meal</button>
+        </div>
+
+
+        <div class="col offset-md-5 col-md-3">
+            <p class="text-center rounded-border text-size"> Estimation of insuline injection: <span id="insulinInjection">50</span> ml</p>
+        </div>
+        <div class="col col-md-1">
+            <button class="rounded-border btn-lg" id="ok_button"> Ok</button>
+        </div>
+    </div>
+
+</div>
+<!-- Modal -->
+<div class="modal fade" id="NameOfMeal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="NameOfMealTitle">Choose a name for your meal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label for="NameOfMeal" class="col-sm-7 col-form-label text-left">Enter the name of your meal:</label>
+                        <div class="col-sm-5 text-right">
+                            <input type="text" class="form-control" id="formNameOfMeal">
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="saveMealToFavourite" type="button" class="btn btn-success">Save the meal</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    let selectedFoodstuffs;
+
+    function populateTableFromSession() {
+        fetch('/get-session-ingredients')
+            .then(response => response.json())
+            .then(data => {
+                if (data.ingredients) {
+                    selectedFoodstuffs = data.ingredients;
+                    console.log(data.ingredients);
+                    populateTable(data.ingredients);
+                }
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        populateTableFromSession();
+    });
+
+    // Example data
+    let session = true;
+    if(!session) {
+        document.getElementById("SaveMealButton").visibility = "hidden";
+    }
+
+    document.getElementById("ok_button").addEventListener("click", function () {
+        window.location.href = "/foodstuffs_selection";
+    })
+
+    // Function to populate the table
+    function populateTable(data) {
+        const tableBody = document.getElementById('data-table-body');
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td class="img-cell"><img src="${item.image_link}" alt="${item.label}"></td>
+                    <td class="text-center">${item.label}</td>
+                    <td class="text-center">${item.amount}</td>
+                    <td class="text-center">${item.kcal}</td>
+                    <td class="text-center">${item.carbs}</td>
+                `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    async function saveMeal() {
+        const mealName = document.getElementById('formNameOfMeal').value;
+        if (!mealName) {
+            alert("Please enter a name for your meal.");
+            return;
+        }
+
+        const ingredients = Array.from(selectedFoodstuffs.values());
+
+        const mealData = {
+            name: mealName,
+            userId: 1,
+            ingredients: ingredients
+        };
+
+        try {
+            const response = await fetch('/api/v1/meals/combinations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mealData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save the meal');
+            }
+
+            alert("Meal saved successfully!");
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+
+    document.getElementById('saveMealToFavourite').addEventListener('click', saveMeal)
+
+    document.getElementById('ok_button').addEventListener('click', function () {
+        fetch('/reset-ingredients', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('Ingredients reset');
+                populateTable([]); // Clear the table
+            } else {
+                console.log('Failed to reset ingredients');
+            }
+        });
+    });
+
+    async function calculateInsulin() {
+        try {
+            const insulinData = {
+                glucose_level: 34, // Example value
+                glucose_goal: 34, // Example value
+                insulin_sensitivity: 3 // Example value
+            };
+
+            const response = await fetch('/api/v1/insulin/compute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(insulinData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to calculate insulin');
+            }
+
+            const data = await response.json();
+            document.getElementById('insulinInjection').innerHTML = `${data.Insulin}`;
+        } catch (error) {
+            document.getElementById('insulinInjection').innerText = 'Error: ' + error.message;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', calculateInsulin);
+</script>
+{% endblock %}

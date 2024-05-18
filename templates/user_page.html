@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>User page</title>
+{% endblock %}
+
+{% block body %}
+    <h1>User page</h1>
+    <p>The page of {{user}}</p>
+    <button id="new_meal">New meal</button>
+    <button id="log_out">Log out</button>
+    <script>
+        document.getElementById("log_out").addEventListener("click", function() {
+            window.location.href = "/log_out";
+        });
+        document.getElementById("new_meal").addEventListener("click", function() {
+            window.location.href = "/foodstuffs_selection";
+        });
+    </script>
+{% endblock %}
