@@ -72,6 +72,9 @@ def foodstuffs_selection():
 
 @app.route("/meal_resume", methods=["POST", "GET"])
 def meal_resume():
+    exemple_of_meal = [{"label":"Banana","image_link": url_for('static', filename='images/Default_image.png'),"amount":4,"kcal":100,"pourcentage":50,"carbohydrate": 50},
+                              {"label":"Bread","image_link": url_for('static', filename='images/Default_image.png'),"amount":1,"kcal":200,"pourcentage":50,"carbohydrate": 50}]
+    exemple_of_response = {'Insuline': 40, 'meal':exemple_of_meal}
     if request.method == "POST":
         data = request.get_json()
         print("Données reçues : ", data)
@@ -83,8 +86,8 @@ def meal_resume():
         }
         return jsonify(response)
     if ("username" in session):
-        return render_template("meal_resume.html", haveSession=True)
-    return render_template("meal_resume.html", haveSession=False)
+        return render_template("meal_resume.html", haveSession=True, exemple_of_response=exemple_of_response)
+    return render_template("meal_resume.html", haveSession=False, exemple_of_response = exemple_of_response)
 
 @app.route("/log_out")
 def log_out():
