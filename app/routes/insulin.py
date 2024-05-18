@@ -46,9 +46,9 @@ def compute_insulin():
     if not data or 'glucose_level' not in data or 'glucose_goal' not in data or 'insulin_sensitivity' not in data:
         return jsonify({"error": "Invalid input"}), 400
 
-    glucose_level = data['glucose_level']
-    glucose_goal = data['glucose_goal']
-    insulin_sensitivity = data['insulin_sensitivity']
+    glucose_level = session['glucose_level']
+    glucose_goal = session['glucose_goal']
+    insulin_sensitivity = session['insulin_sensitivity']
 
     total_carbs = sum(item['carbs'] for item in ingredients_data)
 
