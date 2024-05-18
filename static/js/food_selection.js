@@ -2,15 +2,15 @@ document.getElementById("computeButton").addEventListener("click", function () {
     const glucose_level = document.getElementById("glucose_level").valueAsNumber;
     const sensitivity = document.getElementById("Sensitivity_factor").valueAsNumber;
     const target_level = document.getElementById("target_level").valueAsNumber;
-    if (glucose_level == 0) {
+    if (Number.isNaN(glucose_level)) {
         alert("Complete your glucose level.");
         return;
     }
-    if (target_level == 0) {
+    if (Number.isNaN(target_level)) {
         alert("Complete the target glucose level field.");
         return;
     }
-    if (sensitivity == 0) {
+    if (Number.isNaN(sensitivity)) {
         alert("Complete the sensitivity field.");
         return;
     }
