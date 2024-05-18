@@ -1,5 +1,0 @@
-Flask~=3.0.3
-CouchDB~=1.2
-pandas~=2.2.2
-Flask-CouchDB-Schematics~=1.0.0
-requests~=2.31.0
